@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Our Countdown Timer">
+  <meta name="author" content="Catrin Lam">
+  <title>Our Countdown Timer</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center h-screen bg-gray-100">
+
+<div id="app" class="text-center">
+  <!-- Countdown Timer -->
+  <div class="countdown bg-gray-800 text-blue-400 p-8 rounded-lg text-3xl mb-8">
+    <div class="time inline-block mx-4">
+      <span>{{ days }}</span>
+      <div class="label text-gray-400 text-sm">Days</div>
+    </div>
+    <div class="time inline-block mx-4">
+      <span>{{ hours }}</span>
+      <div class="label text-gray-400 text-sm">Hours</div>
+    </div>
+    <div class="time inline-block mx-4">
+      <span>{{ minutes }}</span>
+      <div class="label text-gray-400 text-sm">Minutes</div>
+    </div>
+    <div class="time inline-block mx-4">
+      <span>{{ seconds }}</span>
+      <div class="label text-gray-400 text-sm">Seconds</div>
+    </div>
+  </div>
+
+  <!-- Date Picker Section -->
+  <div class="date-picker bg-gray-700 p-4 rounded-lg text-white text-lg">
+    <h3 class="mb-4">Select Date and Time to Countdown</h3>
+    <input type="date" v-model="selectedDate" class="bg-gray-800 text-white p-2 rounded-md border border-gray-500 mr-2">
+    <input type="time" v-model="selectedTime" class="bg-gray-800 text-white p-2 rounded-md border border-gray-500 mr-2">
+    <button @click="setTargetDate" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md">Start Countdown</button>
+  </div>
+</div>
+
+<!-- Vue 3 CDN -->
+<script src="https://unpkg.com/vue@3"></script>
+<script>
+  const { createApp } = Vue;
+
+  createApp({
+    data() {
+      return {
+        targetDate: null, // Initial target date is empty
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        selectedDate: '', // User-selected date
+        selectedTime: ''  // User-selected time
+      };
+    },
+    methods: {
+      updateCountdown() {
+        const now = new Date().getTime();
+        const distance = this.targetDate - now;
+
+        this.days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        this.seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Stop countdown if the date has passed
+        if (distance < 0) {
+          this.days = this.hours = this.minutes = this.seconds = 0;
+        }
+      },
+      setTargetDate() {
+        if (this.selectedDate && this.selectedTime) {
+          // Combine date and time to set a new targetDate
+          this.targetDate = new Date(`${this.selectedDate}T${this.selectedTime}`).getTime();
+        } else {
+          alert("Please select both date and time.");
+        }
+      }
+    },
+    mounted() {
+      // Update countdown every second if a target date is set
+      setInterval(() => {
+        if (this.targetDate) {
+          this.updateCountdown();
+        }
+      }, 1000);
+    }
+  }).mount("#app");
+</script>
+
+</body>
+</html>
